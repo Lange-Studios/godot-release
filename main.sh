@@ -28,7 +28,7 @@ then
     mkdir -p "$dir/gitignore"
     cd "$dir/gitignore"
     git clone "https://github.com/Lange-Studios/godot-nir-static.git" -b manually-specify-build-tools --depth 1 --recurse-submodules
-    cd gitignore/godot-nir-static
+    cd "$dir/gitignore/godot-nir-static"
     git submodule update --init --recursive --depth 1
     cd "$dir" # Return to script root
 fi
