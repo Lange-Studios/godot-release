@@ -29,6 +29,7 @@ jobs:
 
           ./main.sh godot build --release-mode release --platform $platform --target $target --skip-cs-glue
           
+          ls gitignore/godot/bin
           # Zip from inside the bin folder to keep structure clean
           (cd gitignore/godot/bin && zip -r "../../../${{ matrix.target }}.zip" . -x "obj/*")
 
@@ -70,8 +71,9 @@ jobs:
           platform=$(echo $matrix_target | cut -d'-' -f1)
           target=$(echo $matrix_target | cut -d'-' -f2)
 
-          ./main.sh godot build --release-mode release --platform $platform --target $target
+          ./main.sh godot build --release-mode release --platform $platform --target $target --skip-cs-glue
           
+          ls gitignore/godot/bin
           # Same clean zip logic as linux
           (cd gitignore/godot/bin && zip -r "../../../${{ matrix.target }}.zip" . -x "obj/*")
       
