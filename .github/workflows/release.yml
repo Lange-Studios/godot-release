@@ -1,0 +1,94 @@
+name: Godot Multi-Platform Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_note:
+        description: 'Optional note for this release'
+        required: false
+        type: string
+
+jobs:
+  # --- Linux & Windows Runner Jobs ---
+  linux-builds:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [linux-editor, windows-editor, linux-template, windows-template, android-template]
+    name: Build ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and Zip
+        run: |
+          matrix_target="${{ matrix.target }}"
+          platform=$(echo $matrix_target | cut -d'-' -f1)
+          target=$(echo $matrix_target | cut -d'-' -f2)
+
+          ./main.sh godot build --release-mode release --platform $platform --target $target
+          
+          # Zip from inside the bin folder to keep structure clean
+          (cd gitignore/godot/bin && zip -r "../../../${{ matrix.target }}.zip" . -x "obj/*")
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: ${{ matrix.target }}.zip
+          retention-days: 1
+
+  # --- macOS & iOS Runner Jobs ---
+  apple-builds:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [macos-editor, macos-template, ios-template]
+    name: Build ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and Zip
+        run: |
+          matrix_target="${{ matrix.target }}"
+          platform=$(echo $matrix_target | cut -d'-' -f1)
+          target=$(echo $matrix_target | cut -d'-' -f2)
+
+          ./main.sh godot build --release-mode release --platform $platform --target $target
+          
+          # Same clean zip logic as linux
+          (cd gitignore/godot/bin && zip -r "../../../${{ matrix.target }}.zip" . -x "obj/*")
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: ${{ matrix.target }}.zip
+          retention-days: 1
+
+  # --- Final Release Job ---
+  publish-release:
+    runs-on: ubuntu-latest
+    needs: [linux-builds, apple-builds] # Now waits for both matrices
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-binaries
+          merge-multiple: true 
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: "Lange-Godot Release #${{ github.run_number }}"
+          body: |
+            ## Release Notes
+            ${{ github.event.inputs.release_note }}
+            
+            **Build Details:**
+            - Triggered by: ${{ github.actor }}
+            - Workflow Run: ${{ github.run_id }}
+          files: all-binaries/*
+          generate_release_notes: true
