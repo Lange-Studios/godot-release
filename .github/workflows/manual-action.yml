@@ -1,0 +1,9 @@
+name: Manual Workflow
+on:
+  workflow_dispatch: # This enables the "Run workflow" button
+
+jobs:
+  greet:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Hello! This was started manually."
