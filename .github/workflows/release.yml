@@ -27,16 +27,31 @@ jobs:
           platform=$(echo $matrix_target | cut -d'-' -f1)
           target=$(echo $matrix_target | cut -d'-' -f2)
 
-          ./main.sh godot build --release-mode release --platform $platform --target $target
+          ./main.sh godot build --release-mode release --platform $platform --target $target --skip-cs-glue
           
           # Zip from inside the bin folder to keep structure clean
           (cd gitignore/godot/bin && zip -r "../../../${{ matrix.target }}.zip" . -x "obj/*")
+
+          if [[ "$matrix_target" == "linux-editor" ]]
+          then
+            ./main.sh godot build dotnet-glue
+            (cd gitignore/godot/bin && zip -r "../../../GodotSharp.zip" GodotSharp)
+          fi
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
           path: ${{ matrix.target }}.zip
+          retention-days: 1
+
+      # This step ONLY runs for the linux-editor matrix item
+      - name: Upload GodotSharp
+        if: matrix.target == 'linux-editor'
+        uses: actions/upload-artifact@v4
+        with:
+          name: GodotSharp
+          path: GodotSharp.zip
           retention-days: 1
 
   # --- macOS & iOS Runner Jobs ---
