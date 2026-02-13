@@ -14,6 +14,7 @@ $env.PATH = ($env.PATH | prepend $"($env.PROJECT_DIR)/gitignore/godot-src/zig-ou
 $env.GODOT_SRC_LEAN_ENABLED_INTERNAL = ($env.GODOT_SRC_LEAN_ENABLED? | default false | into bool)
 $env.DOTNET_CLI_TELEMETRY_OPTOUT = true
 $env.DOTNET_NOLOGO = 1
+$env.GODOT_SRC_AUTO_ACCEPT_ANDROID_SDK_LICENSES = true
 
 source gitignore/godot-src/gsrc.nu
 
@@ -42,6 +43,6 @@ export def "work build" [ --matrix-target: string ] {
     if $matrix_target == "linux-editor" {
         godot build dotnet-glue
         cd "gitignore/godot/bin"
-        run-external zip "-r" "../../../GodotSharp.zip" GodotSharp
+        run-external zip "-r" "GodotSharp.zip" GodotSharp
     }
 }
