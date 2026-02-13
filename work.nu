@@ -41,7 +41,7 @@ export def "work build" [ --matrix-target: string ] {
     }
 
     if $matrix_target == "linux-editor" {
-        godot build dotnet-glue
+        gsrc godot build dotnet-glue
         cd "gitignore/godot/bin"
         run-external zip "-r" "GodotSharp.zip" GodotSharp
     }
