@@ -23,27 +23,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwayland-bin libwayland-dev wayland-protocols
-          matrix_target="${{ matrix.target }}"
-          platform=$(echo $matrix_target | cut -d'-' -f1)
-          target=$(echo $matrix_target | cut -d'-' -f2)
+          ./main.sh build --matrix-target "${{ matrix.target }}"
 
-          ./main.sh godot build --release-mode release --platform $platform --target $target --skip-cs-glue
-          
-          ls gitignore/godot/bin
-          # Zip from inside the bin folder to keep structure clean
-          (cd gitignore/godot/bin && zip -r "../../../${{ matrix.target }}.zip" . -x "obj/*")
-
-          if [[ "$matrix_target" == "linux-editor" ]]
-          then
-            ./main.sh godot build dotnet-glue
-            (cd gitignore/godot/bin && zip -r "../../../GodotSharp.zip" GodotSharp)
-          fi
-      
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
-          path: ${{ matrix.target }}.zip
+          path: |
+            submodules/godot/bin
+            !submodules/godot/bin/obj
           retention-days: 1
 
       # This step ONLY runs for the linux-editor matrix item
@@ -67,21 +55,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build and Zip
         run: |
-          matrix_target="${{ matrix.target }}"
-          platform=$(echo $matrix_target | cut -d'-' -f1)
-          target=$(echo $matrix_target | cut -d'-' -f2)
+          ./main.sh build --matrix-target "${{ matrix.target }}"
 
-          ./main.sh godot build --release-mode release --platform $platform --target $target --skip-cs-glue
-          
-          ls gitignore/godot/bin
-          # Same clean zip logic as linux
-          (cd gitignore/godot/bin && zip -r "../../../${{ matrix.target }}.zip" . -x "obj/*")
-      
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
-          path: ${{ matrix.target }}.zip
+          path: |
+            submodules/godot/bin
+            !submodules/godot/bin/obj
           retention-days: 1
 
   # --- Final Release Job ---

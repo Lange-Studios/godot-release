@@ -42,7 +42,7 @@ args=$@
 if [ -z "$args" ]
 then
     cd "$dir"
-    "$dir/gitignore/godot-src/gitignore/pixi/bin/pixi" run --manifest-path "$dir/gitignore/godot-src/pixi.toml" --frozen nu -e "source gsrc.nu"
+    "$dir/gitignore/godot-src/gitignore/pixi/bin/pixi" run --manifest-path "$dir/gitignore/godot-src/pixi.toml" --frozen nu -e "source work.nu"
 else
     "$dir/gitignore/godot-src/gitignore/pixi/bin/pixi" run --manifest-path "$dir/gitignore/godot-src/pixi.toml" --frozen nu "$dir/main.nu" "$args"
 fi
