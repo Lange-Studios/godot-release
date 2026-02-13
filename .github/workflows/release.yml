@@ -29,11 +29,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
-          path: |
-            gitignore/godot/bin
-            !gitignore/godot/bin/obj
-            !gitignore/godot/bin/GodotSharp
-            !gitignore/godot/bin/GodotSharp.zip
+          path: gitignore/release
           retention-days: 1
 
       # This step ONLY runs for the linux-editor matrix item
@@ -63,9 +59,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
-          path: |
-            gitignore/godot/bin
-            !gitignore/godot/bin/obj
+          path: gitignore/release
           retention-days: 1
 
   # --- Final Release Job ---

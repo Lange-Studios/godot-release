@@ -40,9 +40,20 @@ export def "work build" [ --matrix-target: string ] {
         }
     }
 
+    # These platforms automatically zip
+    if ($matrix_target != "ios-template" 
+        and $matrix_target != "macos-template" 
+        and $matrix_target != "android-template") {
+            cd "gitignore/godot/bin"
+            run-external zip "-r" "../../../release/${{ matrix.target }}.zip" . "-x" "obj/*"
+    }
+
     if $matrix_target == "linux-editor" {
         gsrc godot build dotnet-glue
         cd "gitignore/godot/bin"
         run-external zip "-r" "GodotSharp.zip" GodotSharp
     }
+
+    mkdir "gitignore/release"
+    mv "gitignore/godot/bin/*.zip" "gitignore/release"
 }
