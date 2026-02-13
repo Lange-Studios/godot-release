@@ -30,8 +30,10 @@ jobs:
         with:
           name: ${{ matrix.target }}
           path: |
-            submodules/godot/bin
-            !submodules/godot/bin/obj
+            gitignore/godot/bin
+            !gitignore/godot/bin/obj
+            !gitignore/godot/bin/GodotSharp
+            !gitignore/godot/bin/GodotSharp.zip
           retention-days: 1
 
       # This step ONLY runs for the linux-editor matrix item
@@ -40,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: GodotSharp
-          path: GodotSharp.zip
+          path: gitignore/godot/bin/GodotSharp.zip
           retention-days: 1
 
   # --- macOS & iOS Runner Jobs ---
@@ -62,8 +64,8 @@ jobs:
         with:
           name: ${{ matrix.target }}
           path: |
-            submodules/godot/bin
-            !submodules/godot/bin/obj
+            gitignore/godot/bin
+            !gitignore/godot/bin/obj
           retention-days: 1
 
   # --- Final Release Job ---
