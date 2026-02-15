@@ -25,7 +25,7 @@ export def "work" [] {
 
 export def "work build" [ --matrix-target: string ] {
     # This is where we will put all of the files that will get pushed to a github release
-    mkdir "gitignore/release"
+    mkdir $"($env.PROJECT_DIR)/gitignore/release"
 
     match ($matrix_target) {
         "android-template" => {
@@ -47,15 +47,16 @@ export def "work build" [ --matrix-target: string ] {
     if ($matrix_target != "ios-template" 
         and $matrix_target != "macos-template" 
         and $matrix_target != "android-template") {
-            cd "gitignore/godot/bin"
-            run-external zip "-r" "../../../gitignore/release/${{ matrix.target }}.zip" . "-x" "obj/*"
+            cd $"($env.PROJECT_DIR)/gitignore/godot/bin"
+            run-external zip "-r" $"($env.PROJECT_DIR)/gitignore/release/($matrix_target).zip" . "-x" "obj/*"
     }
 
     if $matrix_target == "linux-editor" {
         gsrc godot build dotnet-glue
-        cd "gitignore/godot/bin"
+        cd $"($env.PROJECT_DIR)/gitignore/godot/bin"
         run-external zip "-r" "GodotSharp.zip" GodotSharp
     }
 
+    cd $env.PROJECT_DIR
     mv gitignore/godot/bin/*.zip "gitignore/release"
 }
