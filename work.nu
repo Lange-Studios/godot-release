@@ -58,5 +58,5 @@ export def "work build" [ --matrix-target: string ] {
     }
 
     cd $env.PROJECT_DIR
-    mv gitignore/godot/bin/*.zip "gitignore/release"
+    ls gitignore/godot/bin/*.zip | each { |file| mv $file.name gitignore/release }
 }
