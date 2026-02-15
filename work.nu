@@ -45,7 +45,7 @@ export def "work build" [ --matrix-target: string ] {
         and $matrix_target != "macos-template" 
         and $matrix_target != "android-template") {
             cd "gitignore/godot/bin"
-            run-external zip "-r" "../../../release/${{ matrix.target }}.zip" . "-x" "obj/*"
+            run-external zip "-r" "../../../gitignore/release/${{ matrix.target }}.zip" . "-x" "obj/*"
     }
 
     if $matrix_target == "linux-editor" {
@@ -55,5 +55,5 @@ export def "work build" [ --matrix-target: string ] {
     }
 
     mkdir "gitignore/release"
-    mv "gitignore/godot/bin/*.zip" "gitignore/release"
+    mv gitignore/godot/bin/*.zip "gitignore/release"
 }
