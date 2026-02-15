@@ -24,6 +24,9 @@ export def "work" [] {
 }
 
 export def "work build" [ --matrix-target: string ] {
+    # This is where we will put all of the files that will get pushed to a github release
+    mkdir "gitignore/release"
+
     match ($matrix_target) {
         "android-template" => {
              gsrc godot build template android --release-mode "release" --archs [ "arm64", "x86_64" ]
@@ -54,6 +57,5 @@ export def "work build" [ --matrix-target: string ] {
         run-external zip "-r" "GodotSharp.zip" GodotSharp
     }
 
-    mkdir "gitignore/release"
     mv gitignore/godot/bin/*.zip "gitignore/release"
 }
