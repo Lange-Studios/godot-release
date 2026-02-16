@@ -58,5 +58,8 @@ export def "work build" [ --matrix-target: string ] {
     }
 
     cd $env.PROJECT_DIR
-    ls gitignore/godot/bin/*.zip | each { |file| mv $file.name gitignore/release }
+    (ls gitignore/godot/bin
+        | where {|file| $file.name | str ends-with ".zip"}
+        | each { |file| mv $file.name gitignore/release }
+    )
 }
