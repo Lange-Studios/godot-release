@@ -7,8 +7,11 @@ $env.GODOT_SRC_AUTO_INSTALL_GODOT_NIR = false
 $env.GODOT_SRC_DXC_DIR = ($"($env.PROJECT_DIR)/gitignore/godot-nir-static" | path expand)
 $env.GODOT_SRC_CUSTOM_MODULES = []
 $env.GODOT_SRC_GODOT_EXTRA_SUFFIX = null
+
+# These are now "Defaults" that will be overridden by the command flags
 $env.GODOT_SRC_DOTNET_ENABLED = true
 $env.GODOT_SRC_PRECISION = "double"
+
 $env.GODOT_SRC_EXTRA_SCONS_ARGS = [ "openxr=false" ]
 $env.PATH = ($env.PATH | prepend $"($env.PROJECT_DIR)/gitignore/godot-src/zig-out/bin")
 $env.GODOT_SRC_LEAN_ENABLED_INTERNAL = ($env.GODOT_SRC_LEAN_ENABLED? | default false | into bool)
@@ -23,8 +26,16 @@ export def "work" [] {
 
 }
 
-export def "work build" [ --matrix-target: string ] {
-    # This is where we will put all of the files that will get pushed to a github release
+# Updated to accept new flags from the GitHub Action matrix
+export def "work build" [ 
+    --matrix-target: string,
+    --precision: string,    # "single" or "double"
+    --dotnet: string        # "true" or "false"
+] {
+    $env.GODOT_SRC_PRECISION = $precision
+    $env.GODOT_SRC_DOTNET_ENABLED = ($dotnet | into bool)
+
+    # Prepare release directory
     mkdir $"($env.PROJECT_DIR)/gitignore/release"
 
     match ($matrix_target) {
@@ -43,18 +54,23 @@ export def "work build" [ --matrix-target: string ] {
         }
     }
 
-    # These platforms automatically zip
+    let zip_name = match $dotnet {
+        true => $"($matrix_target)-($precision)-dotnet.zip",
+        false => $"($matrix_target)-($precision).zip",
+    }
+
     if ($matrix_target != "ios-template" 
         and $matrix_target != "macos-template" 
         and $matrix_target != "android-template") {
             cd $"($env.PROJECT_DIR)/gitignore/godot/bin"
-            run-external zip "-r" $"($env.PROJECT_DIR)/gitignore/release/($matrix_target).zip" . "-x" "obj/*"
+            run-external zip "-r" $"($env.PROJECT_DIR)/gitignore/release/($zip_name)" . "-x" "obj/*"
     }
 
-    if $matrix_target == "linux-editor" {
+    if $matrix_target == "linux-editor" and $env.GODOT_SRC_DOTNET_ENABLED {
         gsrc godot build dotnet-glue
         cd $"($env.PROJECT_DIR)/gitignore/godot/bin"
-        run-external zip "-r" "GodotSharp.zip" GodotSharp
+        # We don't rename this yet as your workflow expects 'GodotSharp.zip'
+        run-external zip "-r" $"GodotSharp-($precision).zip" GodotSharp 
     }
 
     cd $env.PROJECT_DIR

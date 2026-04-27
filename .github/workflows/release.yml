@@ -13,42 +13,52 @@ jobs:
   linux-builds:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         target: [linux-editor, windows-editor, linux-template, windows-template, android-template]
-    name: Build ${{ matrix.target }}
+        precision: [single, double]
+        dotnet: [true, false]
+    name: Build ${{ matrix.target }} (${{ matrix.precision }}, dotnet-${{ matrix.dotnet }})
     steps:
       - uses: actions/checkout@v4
       - name: Build and Zip
         run: |
           sudo apt-get update
           sudo apt-get install -y libwayland-bin libwayland-dev wayland-protocols
-          ./main.sh work build --matrix-target "${{ matrix.target }}"
+          
+          # Passing the new matrix properties as arguments to your custom script
+          ./main.sh work build \
+            --matrix-target "${{ matrix.target }}" \
+            --precision "${{ matrix.precision }}" \
+            --dotnet "${{ matrix.dotnet }}"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.target }}
+          # Unique artifact name to prevent matrix overwrites
+          name: ${{ matrix.target }}-${{ matrix.precision }}-dotnet-${{ matrix.dotnet }}
           path: gitignore/release
           retention-days: 1
 
-      # This step ONLY runs for the linux-editor matrix item
+      # This step ONLY runs for the linux-editor when dotnet is enabled
       - name: Upload GodotSharp
-        if: matrix.target == 'linux-editor'
+        if: matrix.target == 'linux-editor' && matrix.dotnet == true
         uses: actions/upload-artifact@v4
         with:
-          name: GodotSharp
-          path: gitignore/godot/bin/GodotSharp.zip
+          name: GodotSharp-${{ matrix.precision }}
+          path: gitignore/godot/bin/GodotSharp-${{ matrix.precision }}.zip
           retention-days: 1
 
   # --- macOS & iOS Runner Jobs ---
   apple-builds:
     runs-on: macos-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         target: [macos-editor, macos-template, ios-template]
-    name: Build ${{ matrix.target }}
+        precision: [single, double]
+        dotnet: [true, false]
+    name: Build ${{ matrix.target }} (${{ matrix.precision }}, dotnet-${{ matrix.dotnet }})
     steps:
       - uses: actions/checkout@v4
 
@@ -58,12 +68,16 @@ jobs:
 
       - name: Build and Zip
         run: |
-          ./main.sh work build --matrix-target "${{ matrix.target }}"
+          ./main.sh work build \
+            --matrix-target "${{ matrix.target }}" \
+            --precision "${{ matrix.precision }}" \
+            --dotnet "${{ matrix.dotnet }}"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.target }}
+          # Unique artifact name to prevent matrix overwrites
+          name: ${{ matrix.target }}-${{ matrix.precision }}-dotnet-${{ matrix.dotnet }}
           path: gitignore/release
           retention-days: 1
 
