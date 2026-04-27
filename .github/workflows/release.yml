@@ -30,7 +30,7 @@ jobs:
           ./main.sh work build \
             --matrix-target "${{ matrix.target }}" \
             --precision "${{ matrix.precision }}" \
-            --dotnet "${{ matrix.dotnet }}"
+            --dotnet=${{ matrix.dotnet }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -71,7 +71,7 @@ jobs:
           ./main.sh work build \
             --matrix-target "${{ matrix.target }}" \
             --precision "${{ matrix.precision }}" \
-            --dotnet "${{ matrix.dotnet }}"
+            --dotnet=${{ matrix.dotnet }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
