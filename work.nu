@@ -30,10 +30,10 @@ export def "work" [] {
 export def "work build" [ 
     --matrix-target: string,
     --precision: string,    # "single" or "double"
-    --dotnet: string        # "true" or "false"
+    --dotnet
 ] {
     $env.GODOT_SRC_PRECISION = $precision
-    $env.GODOT_SRC_DOTNET_ENABLED = ($dotnet | into bool)
+    $env.GODOT_SRC_DOTNET_ENABLED = $dotnet
 
     # Prepare release directory
     mkdir $"($env.PROJECT_DIR)/gitignore/release"
