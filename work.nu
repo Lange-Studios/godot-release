@@ -59,17 +59,26 @@ export def "work build" [
         false => $"($matrix_target)-($precision).zip",
     }
 
-    if ($matrix_target != "ios-template" 
-        and $matrix_target != "macos-template" 
-        and $matrix_target != "android-template") {
-            cd $"($env.PROJECT_DIR)/gitignore/godot/bin"
-            run-external zip "-r" $"($env.PROJECT_DIR)/gitignore/release/($zip_name)" . "-x" "obj/*"
+    let existing_zip_name = match $matrix_target {
+        "ios-template" => "ios.zip",
+        "macos-template" => "macos.zip",
+        "android-template" => "android_source.zip)",
+        _ => ""
+    }
+
+    if ($existing_zip_name | is-not-empty) {
+        (mv 
+            $"($env.PROJECT_DIR)/gitignore/godot/bin/($existing_zip_name)" 
+            $"($env.PROJECT_DIR)/gitignore/godot/bin/($zip_name)"
+        )
+    } else {
+        cd $"($env.PROJECT_DIR)/gitignore/godot/bin"
+        run-external zip "-r" $"($env.PROJECT_DIR)/gitignore/release/($zip_name)" . "-x" "obj/*"
     }
 
     if $matrix_target == "linux-editor" and $env.GODOT_SRC_DOTNET_ENABLED {
         gsrc godot build dotnet-glue
         cd $"($env.PROJECT_DIR)/gitignore/godot/bin"
-        # We don't rename this yet as your workflow expects 'GodotSharp.zip'
         run-external zip "-r" $"GodotSharp-($precision).zip" GodotSharp 
     }
 
