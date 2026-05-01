@@ -62,7 +62,7 @@ export def "work build" [
     let existing_zip_name = match $matrix_target {
         "ios-template" => "ios.zip",
         "macos-template" => "macos.zip",
-        "android-template" => "android_source.zip)",
+        "android-template" => "android_source.zip",
         _ => ""
     }
 
