@@ -63,7 +63,7 @@ export def "work build" [
         "ios-template" => "ios.zip",
         "macos-template" => "macos.zip",
         "android-template" => "android_source.zip",
-        _ => ""
+        _ => "",
     }
 
     if ($existing_zip_name | is-not-empty) {
