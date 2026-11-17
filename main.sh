@@ -27,8 +27,11 @@ if [[ ! -d "$dir/gitignore/godot-nir-static" && "$*" == *"windows"* ]]
 then
     mkdir -p "$dir/gitignore"
     cd "$dir/gitignore"
-    git clone "https://github.com/Lange-Studios/godot-nir-static.git" -b manually-specify-build-tools --depth 1 --recurse-submodules
+    git clone "https://github.com/Lange-Studios/godot-nir-static.git" -b manually-specify-build-tools --depth 1
     cd "$dir/gitignore/godot-nir-static"
+    # Use our GitHub mirror of mesa instead of gitlab.freedesktop.org, which rate limits CI
+    git submodule init
+    git config submodule.mesa.url "https://github.com/Lange-Studios/mesa-mirror.git"
     git submodule update --init --recursive --depth 1
     cd "$dir" # Return to script root
 fi
